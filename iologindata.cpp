@@ -402,6 +402,7 @@ bool IOLoginData::loadPlayer(Player* player, const std::string& name, bool preLo
 {
 	Database* db = Database::getInstance();
 	DBQuery query;
+	// CÓDIGO ANTIGO COMENTADO
 	query << "SELECT `id`, `account_id`, `group_id`, `world_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, ";
 	query << "`health`, `healthmax`, `blessings`, `mana`, `manamax`, `manaspent`, `soul`, `lookbody`, `lookfeet`, ";
 	query << "`lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, `posz`, `cap`, `lastlogin`, ";
@@ -410,6 +411,10 @@ bool IOLoginData::loadPlayer(Player* player, const std::string& name, bool preLo
 	query << "`loss_items`, `marriage`, `promotion`, `description`, `pvparenafrags`, `pvparenadeaths`, `tournament_score`, `tournament_weekly_score` FROM `players` WHERE `name` ";
 	query << db->getStringComparison() << db->escapeString(name) << " AND `world_id` = ";
 	query << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `deleted` = 0 LIMIT 1";
+
+	// >>> CÓDIGO NOVO E SIMPLIFICADO PARA TESTE <<<
+	// Query Final, 100% Limpa e Estável
+    // query << "SELECT `id`, `name`, `account_id`, `group_id`, `level`, `vocation`, `health`, `healthmax`, `experience`, `mana`, `manamax`, `posx`, `posy`, `posz`, `town_id`, `looktype`, `lookhead`, `lookbody`, `looklegs`, `lookfeet`, `lookaddons`, `description`, `sex`, `soul`, `cap`, `stamina`, `balance`, `blessings`, `conditions`, `marriage`, `promotion`, `maglevel`, `direction` FROM `players` WHERE `name` " << db->getStringComparison() << db->escapeString(name) << " AND `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `deleted` = 0 LIMIT 1";
 
 	DBResult* result;
 	if(!(result = db->storeQuery(query.str())))
@@ -491,13 +496,13 @@ bool IOLoginData::loadPlayer(Player* player, const std::string& name, bool preLo
 	player->manaMax = result->getDataInt("manamax");
 
 	player->magLevel = result->getDataInt("maglevel");
-	uint64_t nextManaCount = player->vocation->getReqMana(player->magLevel + 1);
-	uint64_t manaSpent = result->getDataLong("manaspent");
-	if(manaSpent > nextManaCount)
-		manaSpent = 0;
+    uint64_t nextManaCount = player->vocation->getReqMana(player->magLevel + 1);
+    uint64_t manaSpent = result->getDataLong("manaspent");
+        if(manaSpent > nextManaCount)
+            manaSpent = 0;
 
-	player->manaSpent = manaSpent;
-	player->magLevelPercent = Player::getPercentLevel(player->manaSpent, nextManaCount);
+        player->manaSpent = manaSpent;
+        player->magLevelPercent = Player::getPercentLevel(player->manaSpent, nextManaCount);
 	if(!group || !group->getOutfit())
 	{
 		player->defaultOutfit.lookType = result->getDataInt("looktype");
